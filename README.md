@@ -21,7 +21,11 @@ The issues were:
     5.) This is repeated over and over again.  
     6.) The user can stop adding new masternode key by just pressing the enter-key without adding some text.   
     
-
+  
+    
+      
+        
+Needed steps:
 
 
 
