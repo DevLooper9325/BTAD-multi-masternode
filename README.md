@@ -1,9 +1,10 @@
 # BTAD-multi-masternode
-BTAD multi masternode(this is not the official script , use at your own risk)
+BTAD multi masternode (this is not the official script , use at your own risk)
 
 Information:
 -> This one is forked from here:https://github.com/ebe222/BTAD-multi-masternode
-I had issues in executing the orignal script on my vps.
+
+because I had issues in executing the orignal script on my vps.
 The issues were:
 
 1.) It was not possible to bind on adress 192.168.1.X. (I changed it in this script to 127.0.0.X)
