@@ -1,25 +1,25 @@
 # BTAD-multi-masternode
-BTAD multi masternode (this is not the official script , use at your own risk)
+BTAD multi masternode (this is not the official script , use at your own risk)  
 
-Information:
--> This one is forked from here:https://github.com/ebe222/BTAD-multi-masternode
+Information:  
+-> This one is forked from here:https://github.com/ebe222/BTAD-multi-masternode  
 
-because I had issues in executing the orignal script on my vps.
-The issues were:
+because I had issues in executing the orignal script on my vps.  
+The issues were:  
 
-1.) It was not possible to bind on adress 192.168.1.X. (I changed it in this script to 127.0.0.X)
+1.) It was not possible to bind on adress 192.168.1.X. (I changed it in this script to 127.0.0.X)  
 2.) The variable 'dev2' was always empty and therefore the command 'ip addr del ...' and 'ip addr add ...' in the script
-    were not working. 
-3.) The number of masternodes could not be greater than 9. (At least on my computer)
+    were not working.   
+3.) The number of masternodes could not be greater than 9. (At least on my computer)  
     Now no arguments are needed anymore. And the script stops adding new masternode if user just press return key when
-    the script is asking about masternode key.
-    This means:
-    1.) User executes the script.
-    2.) Prompt is shown for adding new masternode key. 
-    3.) User insert the new masternode key now.
-    4.) This new masternode will be prepared and after when the user is asked again about next new masternode key.
-    5.) This is repeated over and over again.
-    6.) The user can stop adding new masternode key by just pressing the enter-key without adding some text. 
+    the script is asking about masternode key.  
+    This means:  
+    1.) User executes the script.  
+    2.) Prompt is shown for adding new masternode key.   
+    3.) User insert the new masternode key now.  
+    4.) This new masternode will be prepared and after when the user is asked again about next new masternode key.  
+    5.) This is repeated over and over again.  
+    6.) The user can stop adding new masternode key by just pressing the enter-key without adding some text.   
     
 
 
@@ -40,7 +40,7 @@ masternode genkey
 ``` 
 remember that each nodes needs a different key.
 -> If you just press the enter-key, without providing new masternode-key then the script knows that you do not want to
-add more masternodes.
+add more masternodes.  
 
 
 after everything is done , start it up 
