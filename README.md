@@ -17,7 +17,7 @@ The issues were:
     1.) User executes the script.  
     2.) Prompt is shown for adding new masternode key.   
     3.) User insert the new masternode key now.  
-    4.) This new masternode will be prepared and after when the user is asked again about next new masternode key.  
+    4.) This new masternode will be prepared and then the user is asked again about next new masternode key.  
     5.) This is repeated over and over again.  
     6.) The user can stop adding new masternode key by just pressing the enter-key without adding some text.   
     
