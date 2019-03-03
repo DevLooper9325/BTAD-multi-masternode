@@ -2,54 +2,10 @@
 
 BASE="/home/sap"
 PORT=8120
-# Execute options
-ARGS=$(getopt -o "hp:n:c:r:wsudx" -l "help,count:,net" -n "multinode_SAP.sh" -- "$@");
-
 net=4
-count=1
-eval set -- "$ARGS";
+count=1000
 
-while true; do
-    case "$1" in
-        -n|--net)
-            shift;
-                    if [ -n "$1" ];
-                    then
-                        net="$1";
-                        shift;
-                    fi
-            ;;
-        -c|--count)
-            shift;
-                    if [ -n "$1" ];
-                    then
-                        count="$1";
-                        shift;
-                    fi
-            ;;
-        --)
-            shift;
-            break;
-            ;;
-    esac
-done
-	
-#######################-------------------------------------------------------------------------IP TESTING	
 
-# break here of net isn't 4 or 6
-if [ ${net} -ne 4 ] && [ ${net} -ne 6 ]; then
-    echo "invalid NETWORK setting, can only be 4 or 6!"
-    exit 1;
-fi
-	
-if [ ${net} = 4 ]; then
-	IPADDRESS=$(ip addr | grep 'inet ' | grep -Ev 'inet 127|inet 192\.168|inet 10\.' | sed "s/[[:space:]]*inet \([0-9.]*\)\/.*/\1/")
-fi
-	
-if [ ${net} = 6 ]; then
-	IPADDRESS=$(ip -6 addr show dev eth0 | grep inet6 | awk -F '[ \t]+|/' '{print $3}' | grep -v ^fe80 | grep -v ^::1 | cut -f1-4 -d':' | head -1)
-fi
-#######################-------------------------------------------------------------------------END IP TESTING
 
 # currently only for Ubuntu 16.04 & 18.04
     if [[ -r /etc/os-release ]]; then
@@ -137,33 +93,29 @@ else
     adduser --disabled-password --gecos "" sap
 fi
 
-netDisable=$(lshw -c network | grep -c 'network DISABLED')
-venet0=$(cat /etc/network/interfaces | grep -c venet)
-
-if [ $netDisable -ge 1 ]; then
-	if [ $venet0 -ge 1 ]; 
-	then
-		dev2=venet0
-	else
-		echo 'Cannot use this script at this time'
-		exit 1
-	fi
-else
-	dev2=$(lshw -c network | grep logical | cut -d':' -f2 | cut -d' ' -f2)
-fi
 
 # individual data dirs for now to avoid problems
 echo "* Creating masternode directories"
 mkdir -p "$BASE"/multinode
 for NUM in $(seq 1 ${count}); do
     if [ ! -d "$BASE"/multinode/SAP_"${NUM}" ]; then
-        echo "creating data directory $BASE/multinode/SAP_${NUM}" 
-        mkdir -p "$BASE"/multinode/SAP_"${NUM}" 
+        
+		read -e -p "MasterNode Key for SAP_"${NUM}" (if no more should be added now then just press enter-key) : " MKey
+		
+		#If user input is empty. (just return key was pressed) then stop the loop
+		if [ -z "$MKey" ]
+        then
+           break
+        fi
+		
 		#Generating Random Password for BitcoinAdultd JSON RPC
 		USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 		USERPASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-		read -e -p "MasterNode Key for SAP_"${NUM}": " MKey
+				
+		echo "creating data directory $BASE/multinode/SAP_${NUM}" 
+        mkdir -p "$BASE"/multinode/SAP_"${NUM}" 
 		echo "rpcallowip=127.0.0.1
+		
 rpcuser=$USER
 rpcpassword=$USERPASS
 server=1
@@ -187,14 +139,9 @@ addnode=144.202.0.206
 addnode=37.59.226.53
 addnode=149.28.98.249
 addnode=42.191.170.33" |sudo tee -a "$BASE"/multinode/SAP_"${NUM}"/BitcoinAdult.conf >/dev/null
-echo 'bind=192.168.1.'"${NUM}"':'"$PORT" >> "$BASE"/multinode/SAP_"${NUM}"/BitcoinAdult.conf
+echo 'bind=127.0.0.'"${NUM}"':'"$PORT" >> "$BASE"/multinode/SAP_"${NUM}"/BitcoinAdult.conf
 echo 'rpcport=8119'"${NUM}" >> "$BASE"/multinode/SAP_"${NUM}"/BitcoinAdult.conf
-
-echo 'ip addr del 192.168.1.'"${NUM}"'/32 dev '"$dev2"':'"${NUM}" >> start_multinode.sh
-echo 'ip addr add 192.168.1.'"${NUM}"'/32 dev '"$dev2"':'"${NUM}" >> start_multinode.sh
 echo "runuser -l sap -c 'BitcoinAdultd -daemon -pid=$BASE/multinode/SAP_${NUM}/BitcoinAdult.pid -conf=$BASE/multinode/SAP_${NUM}/BitcoinAdult.conf -datadir=$BASE/multinode/SAP_${NUM}'" >> start_multinode.sh
-
-echo 'ip addr del 192.168.1.'"${NUM}"'/32 dev '"$dev2"':'"${NUM}" >> stop_multinode.sh
 echo "BitcoinAdult-cli -conf=$BASE/multinode/SAP_${NUM}/BitcoinAdult.conf -datadir=$BASE/multinode/SAP_${NUM} stop" >> stop_multinode.sh
 
 echo "echo '====================================================${NUM}========================================================================'" >> mn_status.sh
@@ -209,6 +156,9 @@ cp -R sporks "$BASE"/multinode/SAP_"${NUM}"/
 fi
 done
 
+
+
+
 chmod +x start_multinode.sh
 chmod +x stop_multinode.sh
 chmod +x mn_status.sh
@@ -219,6 +169,10 @@ cat mn_getinfo.sh >> /usr/local/bin/mn_getinfo.sh
 cat mn_status.sh >> /usr/local/bin/mn_status.sh
 chown -R sap:sap /home/sap/multinode
 chmod -R g=u /home/sap/multinode
+
+
+
+
 
 echo 'run start_multinode.sh to start the multinode'
 echo 'run stop_multinode.sh to stop it'
